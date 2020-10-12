@@ -6,9 +6,18 @@ provider "aws" {
 #############################
 # S3 Bucket for VPC Flow logs
 #############################
+data "template_file" "Obsrvbl_s3bucketpolicy_doc" {
+  template = file("Obsrvbl_s3bucketpolicy_tf.json")
+
+  vars = {
+    S3bucketName = var.S3BucketName
+  }
+}
+
 resource "aws_s3_bucket" "Obsrvblebucket" {
   bucket = var.S3BucketName
   acl    = "private"
+  policy =  data.template_file.Obsrvbl_s3bucketpolicy_doc.rendered
   tags = {
     Name        = "BucketForVPCFlowLogs"
   }
